@@ -1,5 +1,6 @@
 #include <fstream>
 #include <cstdarg>
+#include <cstdlib>
 
 void die(const char *format, ...);
 
@@ -22,6 +23,7 @@ void readfile()
   file = new unsigned char [len+1];
   if (fread(file, 1, len, fd) != len)
     die("failed to read file \"in\"");
+  fclose(fd);
 }
 
 void readtree()
