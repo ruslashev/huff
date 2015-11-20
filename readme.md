@@ -1,6 +1,6 @@
 [xx xxxx] 6 bits indicating how many bits per value - n
 to output for a node:
-  if is a node:
+  if it is a leaf:
     [0]
     recurse for left
     recurse for right

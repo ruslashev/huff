@@ -25,28 +25,33 @@ struct tree
 
 void ntobinary(int bits, int n, std::vector<char> *stream)
 {
+  std::vector<char> buf;
   int i = 0;
   while (n) {
     i++;
-    printf("%d", (n % 2));
+    buf.push_back(n % 2);
     n /= 2;
   }
+  if (buf.size() > pow(2, (size_t)bits+1)-1)
+    die("%d bits is not enough", bits);
   for (int j = i; j <= bits; j++)
-    printf("0");
-  printf("\n");
+    buf.push_back(0);
+  for (i = 0; i < bits; i++)
+    stream->push_back(buf[bits-i-1]);
 }
 
-// void outputtree(tree *node, std::vector<char> *stream)
-// {
-//   if (node->leaf) {
-//     stream->push_back('0');
-//     outputtree(node->left);
-//     outputtree(node->right);
-//   } else {
-//     stream->push_back('1');
-//     ntobinary(6, node->freq, stream);
-//   }
-// }
+void outputtree(int bits, tree *node, std::vector<char> *stream)
+{
+  if (node->leaf) {
+    stream->push_back(0);
+    outputtree(bits, node->left, stream);
+    outputtree(bits, node->right, stream);
+  } else {
+    stream->push_back(1);
+    ntobinary(bits, node->freq, stream);
+    ntobinary(bits, node->val, stream);
+  }
+}
 
 void findtree(tree *node, char val, std::string &code, bool &success)
 {
@@ -133,22 +138,17 @@ int main()
   }
 
   std::vector<char> stream;
-  stream.push_back('0');
-  stream.push_back('0');
-  stream.push_back('0');
-  stream.push_back('1');
-  stream.push_back('0');
-  stream.push_back('0'); // 6 bits
-  // outputtree(root, &stream);
-  ntobinary(6, 1, nullptr);
-  ntobinary(6, 2, nullptr);
-  ntobinary(6, 3, nullptr);
-  ntobinary(6, 4, nullptr);
-  ntobinary(6, 5, nullptr);
-  ntobinary(6, 6, nullptr);
-  ntobinary(6, 7, nullptr);
-  ntobinary(6, 9, nullptr);
-  ntobinary(6, 127, nullptr);
+  stream.push_back(0);
+  stream.push_back(0);
+  stream.push_back(0);
+  stream.push_back(1);
+  stream.push_back(0);
+  stream.push_back(1); // 6 bits saying 5 bits
+  outputtree(5, root, &stream);
+
+  for (char c : stream)
+    printf("%c", '0'+c);
+  puts("");
 
   // FILE *f = fopen("in", "wb");
   // tree root =
