@@ -23,41 +23,45 @@ struct tree
   unsigned int freq;
 };
 
-void printree(tree *node, int indent=0)
+void ntobinary(int bits, int n, std::vector<char> *stream)
 {
-  const char *indstr = "|";
-  if (node->leaf) {
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("%d:'%c'\n", node->freq, node->val);
-  } else {
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("^ %d\n", node->freq);
-    if (node->left)
-      printree(node->left, indent+1);
-    if (node->right)
-      printree(node->right, indent+1);
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("v\n");
+  int i = 0;
+  while (n) {
+    i++;
+    printf("%d", (n % 2));
+    n /= 2;
   }
+  for (int j = i; j <= bits; j++)
+    printf("0");
+  printf("\n");
 }
+
+// void outputtree(tree *node, std::vector<char> *stream)
+// {
+//   if (node->leaf) {
+//     stream->push_back('0');
+//     outputtree(node->left);
+//     outputtree(node->right);
+//   } else {
+//     stream->push_back('1');
+//     ntobinary(6, node->freq, stream);
+//   }
+// }
 
 void findtree(tree *node, char val, std::string &code, bool &success)
 {
-  // h: 0100
   if (node->leaf) {
     if (node->val == val)
       success = 1;
   } else {
-    code += '0';
     findtree(node->left, val, code, success);
     if (success)
-      return;
-    code.pop_back();
-    code += '1';
-    findtree(node->right, val, code, success);
+      code = "0" + code;
+    else {
+      findtree(node->right, val, code, success);
+      if (success)
+        code = "1" + code;
+    }
   }
 }
 
@@ -120,7 +124,6 @@ int main()
         [](auto i, auto j) { return i.freq < j.freq; });
   }
   tree *root = list[0].node;
-  printree(root);
 
   for (size_t i = 0; i < text.length(); i++) {
     std::string code = "";
@@ -129,8 +132,26 @@ int main()
     printf("'%c' = %s\n", text[i], code.c_str());
   }
 
+  std::vector<char> stream;
+  stream.push_back('0');
+  stream.push_back('0');
+  stream.push_back('0');
+  stream.push_back('1');
+  stream.push_back('0');
+  stream.push_back('0'); // 6 bits
+  // outputtree(root, &stream);
+  ntobinary(6, 1, nullptr);
+  ntobinary(6, 2, nullptr);
+  ntobinary(6, 3, nullptr);
+  ntobinary(6, 4, nullptr);
+  ntobinary(6, 5, nullptr);
+  ntobinary(6, 6, nullptr);
+  ntobinary(6, 7, nullptr);
+  ntobinary(6, 9, nullptr);
+  ntobinary(6, 127, nullptr);
+
   // FILE *f = fopen("in", "wb");
-  // tree root = 
+  // tree root =
 
   return 0;
 }
