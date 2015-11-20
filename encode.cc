@@ -43,13 +43,13 @@ void ntobinary(int bits, int n, std::vector<char> *stream)
 void outputtree(int bits, tree *node, std::vector<char> *stream)
 {
   if (node->leaf) {
+    stream->push_back(1);
+    ntobinary(bits, (int)node->freq, stream);
+    ntobinary(bits, (int)node->val, stream);
+  } else {
     stream->push_back(0);
     outputtree(bits, node->left, stream);
     outputtree(bits, node->right, stream);
-  } else {
-    stream->push_back(1);
-    ntobinary(bits, node->freq, stream);
-    ntobinary(bits, node->val, stream);
   }
 }
 
