@@ -23,25 +23,12 @@ struct tree
   unsigned int freq;
 };
 
-void printree(tree *node, int indent=0)
+unsigned char po2(int n)
 {
-  const char *indstr = "|  ";
-  if (node->leaf) {
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("%d:'%c'\n", node->freq, node->val);
-  } else {
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("^ %d\n", node->freq);
-    if (node->right)
-      printree(node->right, indent+1);
-    if (node->left)
-      printree(node->left, indent+1);
-    for (int i = 0; i < indent; i++)
-      printf("%s", indstr);
-    printf("v\n");
-  }
+  unsigned char result = 1;
+  for (int i = 0; i < n; i++)
+    result *= 2;
+  return result;
 }
 
 void ntobinary(int bits, int n, std::vector<char> *stream)
@@ -90,14 +77,6 @@ void findtree(tree *node, char val, std::string &code, bool &success)
         code = "1" + code;
     }
   }
-}
-
-unsigned char po2(int n)
-{
-  unsigned char result = 1;
-  for (int i = 0; i < n; i++)
-    result *= 2;
-  return result;
 }
 
 int main()
@@ -160,8 +139,6 @@ int main()
   }
   tree *root = list[0].node;
 
-  printree(root);
-
   std::vector<char> stream = {
     0, 0, 0, 1, 0, 1, // 6 bits saying 5 bits for frequency
     0, 0, 0, 1, 1, 1}; // 6 bits saying 7 bits for value
@@ -181,10 +158,6 @@ int main()
 
   printf("original message size: %zu B\ncompressed incl. tree: %zu B\n",
       text.size(), stream.size()/8);
-
-  for (char c : stream)
-    printf("%c", '0'+c);
-  puts("");
 
   std::vector<unsigned char> file;
   unsigned char current = 0, i = 1;
