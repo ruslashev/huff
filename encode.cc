@@ -92,6 +92,14 @@ void findtree(tree *node, char val, std::string &code, bool &success)
   }
 }
 
+unsigned char po2(int n)
+{
+  unsigned char result = 1;
+  for (int i = 0; i < n; i++)
+    result *= 2;
+  return result;
+}
+
 int main()
 {
   const std::string text = "hello, world! this is an example asdfghjkl";
@@ -152,38 +160,50 @@ int main()
   }
   tree *root = list[0].node;
 
+  printree(root);
+
+  std::vector<char> stream = {
+    0, 0, 0, 1, 0, 1, // 6 bits saying 5 bits for frequency
+    0, 0, 0, 1, 1, 1}; // 6 bits saying 7 bits for value
+
+  outputtree(5, 7, root, &stream);
+
   for (size_t i = 0; i < text.length(); i++) {
     std::string code = "";
     bool success = false;
     findtree(root, text[i], code, success);
-    printf("'%c' = %s\n", text[i], code.c_str());
+    for (char &c : code)
+      stream.push_back(c-'0');
   }
 
-  printree(root);
+  while (stream.size() % 8)
+    stream.push_back(0);
 
-  std::vector<char> stream;
-  stream.push_back(0);
-  stream.push_back(0);
-  stream.push_back(0);
-  stream.push_back(1);
-  stream.push_back(1);
-  stream.push_back(1); // 6 bits saying 5 bits for frequency
-
-  stream.push_back(0);
-  stream.push_back(0);
-  stream.push_back(0);
-  stream.push_back(1);
-  stream.push_back(0);
-  stream.push_back(1); // 6 bits saying 7 bits for value
-  outputtree(5, 7, root, &stream);
+  printf("original message size: %zu B\ncompressed incl. tree: %zu B\n",
+      text.size(), stream.size()/8);
 
   for (char c : stream)
     printf("%c", '0'+c);
   puts("");
 
+  std::vector<unsigned char> file;
+  unsigned char current = 0, i = 1;
+  for (char &c : stream) {
+    current += c * po2(8-i);
+    i++;
+    if (i > 8) {
+      file.push_back(current);
+      current = 0;
+      i = 1;
+    }
+  }
 
-  // FILE *f = fopen("in", "wb");
-  // tree root =
+  FILE *fd = fopen("in", "wb");
+  if (!fd)
+    die("failed to open file to read \"in\"");
+  fwrite(file.data(), sizeof(unsigned char),
+      file.size()*sizeof(unsigned char), fd);
+  fclose(fd);
 
   return 0;
 }
