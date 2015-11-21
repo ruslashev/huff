@@ -23,8 +23,31 @@ struct tree
   unsigned int freq;
 };
 
+void printree(tree *node, int indent=0)
+{
+  const char *indstr = "|  ";
+  if (node->leaf) {
+    for (int i = 0; i < indent; i++)
+      printf("%s", indstr);
+    printf("%d:'%c'\n", node->freq, node->val);
+  } else {
+    for (int i = 0; i < indent; i++)
+      printf("%s", indstr);
+    printf("^ %d\n", node->freq);
+    if (node->right)
+      printree(node->right, indent+1);
+    if (node->left)
+      printree(node->left, indent+1);
+    for (int i = 0; i < indent; i++)
+      printf("%s", indstr);
+    printf("v\n");
+  }
+}
+
 void ntobinary(int bits, int n, std::vector<char> *stream)
 {
+  if (n > pow(2, bits+1)-1)
+    die("%d bits is not enough", bits);
   std::vector<char> buf;
   int i = 0;
   while (n) {
@@ -32,24 +55,23 @@ void ntobinary(int bits, int n, std::vector<char> *stream)
     buf.push_back(n % 2);
     n /= 2;
   }
-  if (buf.size() > pow(2, (size_t)bits+1)-1)
-    die("%d bits is not enough", bits);
   for (int j = i; j <= bits; j++)
     buf.push_back(0);
-  for (i = 0; i < bits; i++)
+  for (i = 0; i < bits; i++) {
     stream->push_back(buf[bits-i-1]);
+  }
 }
 
-void outputtree(int bits, tree *node, std::vector<char> *stream)
+void outputtree(int bitsf, int bitsv, tree *node, std::vector<char> *stream)
 {
   if (node->leaf) {
     stream->push_back(1);
-    ntobinary(bits, (int)node->freq, stream);
-    ntobinary(bits, (int)node->val, stream);
+    ntobinary(bitsf, node->freq, stream);
+    ntobinary(bitsv, node->val, stream);
   } else {
     stream->push_back(0);
-    outputtree(bits, node->left, stream);
-    outputtree(bits, node->right, stream);
+    outputtree(bitsf, bitsv, node->left, stream);
+    outputtree(bitsf, bitsv, node->right, stream);
   }
 }
 
@@ -137,18 +159,28 @@ int main()
     printf("'%c' = %s\n", text[i], code.c_str());
   }
 
+  printree(root);
+
   std::vector<char> stream;
   stream.push_back(0);
   stream.push_back(0);
   stream.push_back(0);
   stream.push_back(1);
+  stream.push_back(1);
+  stream.push_back(1); // 6 bits saying 5 bits for frequency
+
   stream.push_back(0);
-  stream.push_back(1); // 6 bits saying 5 bits
-  outputtree(5, root, &stream);
+  stream.push_back(0);
+  stream.push_back(0);
+  stream.push_back(1);
+  stream.push_back(0);
+  stream.push_back(1); // 6 bits saying 7 bits for value
+  outputtree(5, 7, root, &stream);
 
   for (char c : stream)
     printf("%c", '0'+c);
   puts("");
+
 
   // FILE *f = fopen("in", "wb");
   // tree root =
