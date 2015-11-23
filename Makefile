@@ -4,11 +4,11 @@ all:
 	# g++ encode.cc -o encode -std=c++14
 	# ./encode
 
-decode:
+decoder:
 	g++ decode.cc -o decode -std=c++14
 	./decode
 
-encode:
+encoder:
 	g++ encode.cc -o encode -std=c++14
 	./encode
 

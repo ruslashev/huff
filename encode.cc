@@ -18,7 +18,6 @@ void die(const char *format, ...)
 struct tree
 {
   tree *left, *right;
-  bool leaf;
   char val;
   unsigned int freq;
 };
@@ -51,7 +50,7 @@ void ntobinary(int bits, int n, std::vector<char> *stream)
 
 void outputtree(int bitsf, int bitsv, tree *node, std::vector<char> *stream)
 {
-  if (node->leaf) {
+  if (node->val) {
     stream->push_back(1);
     ntobinary(bitsf, node->freq, stream);
     ntobinary(bitsv, node->val, stream);
@@ -64,7 +63,7 @@ void outputtree(int bitsf, int bitsv, tree *node, std::vector<char> *stream)
 
 void findtree(tree *node, char val, std::string &code, bool &success)
 {
-  if (node->leaf) {
+  if (node->val) {
     if (node->val == val)
       success = 1;
   } else {
@@ -91,14 +90,13 @@ int main()
       freqs[text[i]]++;
 
   struct elem {
-    bool leaf;
     unsigned int freq;
     char val;
     tree *node;
   };
   std::deque<elem> list;
   for (const auto &n : freqs)
-    list.push_back({1, n.second, n.first});
+    list.push_back({n.second, n.first});
 
   std::sort(list.begin(), list.end(),
       [](auto i, auto j) { return i.freq < j.freq; });
@@ -112,23 +110,21 @@ int main()
 
     node->freq = a.freq + b.freq;
 
-    if (a.leaf) {
+    if (a.val) {
       node->left = new tree;
-      node->left->leaf = 1;
       node->left->val = a.val;
       node->left->freq = a.freq;
     } else
       node->left = a.node;
 
-    if (b.leaf) {
+    if (b.val) {
       node->right = new tree;
-      node->right->leaf = 1;
       node->right->val = b.val;
       node->right->freq = b.freq;
     } else
       node->right = b.node;
 
-    list.push_front({0, node->freq, 0, node});
+    list.push_front({node->freq, 0, node});
 
     std::sort(list.begin(), list.end(),
         [](auto i, auto j) { return i.freq < j.freq; });
