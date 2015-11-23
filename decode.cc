@@ -32,35 +32,38 @@ void readfile()
   fseek(fd, 0, SEEK_END);
   size_t len = ftell(fd);
   rewind(fd);
-  unsigned char *file = new unsigned char [len+1];
-  if (fread(file, 1, len, fd) != len)
-    die("failed to read file \"in\"");
-  fclose(fd);
 
   for (size_t i = 0; i < len; i++) {
-    unsigned char byte = file[i];
+    unsigned char byte;
+    if (fread(&byte, 1, 1, fd) != 1)
+      die("failed to read file \"in\"");
     std::deque<char> bitsrev;
-    printf("current byte: %d\n", byte);
     for (size_t j = 0; j < 8; j++) {
       bitsrev.push_front(byte % 2);
       byte /= 2;
     }
-    for (char &c : bitsrev) {
-      printf("%d\n", c);
+    for (char &c : bitsrev)
       bits.push_back(c);
-    }
   }
+
+  fclose(fd);
 }
 
-void readtree()
+int take(int n)
 {
-
+  int num = 0;
+  for (int i = 0; i < n; i++) {
+    num *= 2;
+    num += bits.front();
+    bits.pop_front();
+  }
+  return num;
 }
 
 int main()
 {
   readfile();
-  readtree();
+  printf("%d %d\n", take(6), take(6));
   return 0;
 }
 
