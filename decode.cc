@@ -5,7 +5,7 @@
 #include <deque>
 
 std::deque<char> bits;
-int bitsf, bitsv;
+int bitsv;
 
 void die(const char *format, ...)
 {
@@ -21,7 +21,6 @@ struct tree
 {
   tree *left, *right;
   char val;
-  unsigned int freq;
 };
 
 void readfile()
@@ -65,12 +64,10 @@ tree* readnode()
   tree *node = new tree;
   int type = take(1);
   if (type == 1) {
-    node->freq = take(bitsf);
     node->val = take(bitsv);
   } else if (type == 0) {
     node->left = readnode();
     node->right = readnode();
-    node->freq = node->left->freq + node->right->freq;
     node->val = 0;
   }
 }
@@ -78,7 +75,6 @@ tree* readnode()
 int main()
 {
   readfile();
-  bitsf = take(6);
   bitsv = take(6);
   tree *root = readnode();
 

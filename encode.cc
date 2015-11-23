@@ -48,16 +48,15 @@ void ntobinary(int bits, int n, std::vector<char> *stream)
   }
 }
 
-void outputtree(int bitsf, int bitsv, tree *node, std::vector<char> *stream)
+void outputtree(int bitsv, tree *node, std::vector<char> *stream)
 {
   if (node->val) {
     stream->push_back(1);
-    ntobinary(bitsf, node->freq, stream);
     ntobinary(bitsv, node->val, stream);
   } else {
     stream->push_back(0);
-    outputtree(bitsf, bitsv, node->left, stream);
-    outputtree(bitsf, bitsv, node->right, stream);
+    outputtree(bitsv, node->left, stream);
+    outputtree(bitsv, node->right, stream);
   }
 }
 
@@ -80,14 +79,14 @@ void findtree(tree *node, char val, std::string &code, bool &success)
 
 int main()
 {
-  const std::string text = "hello, world! this is an example asdfghjkl";
+  const std::string message = "hello, world! this is an example asdfghjkl";
 
   std::map<char,unsigned int> freqs;
-  for (size_t i = 0; i < text.length(); i++)
-    if (freqs.find(text[i]) == freqs.end())
-      freqs[text[i]] = 1;
+  for (size_t i = 0; i < message.length(); i++)
+    if (freqs.find(message[i]) == freqs.end())
+      freqs[message[i]] = 1;
     else
-      freqs[text[i]]++;
+      freqs[message[i]]++;
 
   struct elem {
     unsigned int freq;
@@ -132,15 +131,14 @@ int main()
   tree *root = list[0].node;
 
   std::vector<char> stream = {
-    0, 0, 0, 1, 0, 1, // 6 bits saying 5 bits for frequency
     0, 0, 0, 1, 1, 1}; // 6 bits saying 7 bits for value
 
-  outputtree(5, 7, root, &stream);
+  outputtree(7, root, &stream);
 
-  for (size_t i = 0; i < text.length(); i++) {
+  for (size_t i = 0; i < message.length(); i++) {
     std::string code = "";
     bool success = false;
-    findtree(root, text[i], code, success);
+    findtree(root, message[i], code, success);
     for (char &c : code)
       stream.push_back(c-'0');
   }
@@ -149,7 +147,7 @@ int main()
     stream.push_back(0);
 
   printf("original message size: %zu B\ncompressed incl. tree: %zu B\n",
-      text.size(), stream.size()/8);
+      message.size(), stream.size()/8);
 
   std::vector<unsigned char> file;
   unsigned char current = 0, i = 1;
@@ -165,7 +163,7 @@ int main()
 
   FILE *fd = fopen("in", "wb");
   if (!fd)
-    die("failed to open file to read \"in\"");
+    die("failed to open file to write \"in\"");
   fwrite(file.data(), sizeof(unsigned char),
       file.size()*sizeof(unsigned char), fd);
   fclose(fd);
