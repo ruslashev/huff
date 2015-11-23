@@ -20,7 +20,6 @@ void die(const char *format, ...)
 struct tree
 {
   tree *left, *right;
-  bool leaf;
   char val;
   unsigned int freq;
 };
@@ -66,13 +65,13 @@ tree* readnode()
   tree *node = new tree;
   int type = take(1);
   if (type == 1) {
-    node->leaf = 1;
     node->freq = take(bitsf);
     node->val = take(bitsv);
   } else if (type == 0) {
-    node->leaf = 0;
     node->left = readnode();
     node->right = readnode();
+    node->freq = node->left->freq + node->right->freq;
+    node->val = 0;
   }
 }
 
@@ -82,6 +81,25 @@ int main()
   bitsf = take(6);
   bitsv = take(6);
   tree *root = readnode();
+
+  std::string message = "";
+  tree *it = root;
+  while (1) {
+    int n = take(1);
+    if (n)
+      it = it->right;
+    else
+      it = it->left;
+    if (it->val) {
+      message.push_back(it->val);
+      it = root;
+    }
+    if (bits.empty())
+      break;
+  }
+
+  printf("decoded message: \"%s\"\n", message.c_str());
+
   return 0;
 }
 
