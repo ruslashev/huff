@@ -114,8 +114,6 @@ int main()
 
     if (a.leaf) {
       node->left = new tree;
-      node->left->left = nullptr;
-      node->left->right = nullptr;
       node->left->leaf = 1;
       node->left->val = a.val;
       node->left->freq = a.freq;
@@ -124,8 +122,6 @@ int main()
 
     if (b.leaf) {
       node->right = new tree;
-      node->right->left = nullptr;
-      node->right->right = nullptr;
       node->right->leaf = 1;
       node->right->val = b.val;
       node->right->freq = b.freq;

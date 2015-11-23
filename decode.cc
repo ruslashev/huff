@@ -4,6 +4,9 @@
 #include <vector>
 #include <deque>
 
+std::deque<char> bits;
+int bitsf, bitsv;
+
 void die(const char *format, ...)
 {
   va_list args;
@@ -21,8 +24,6 @@ struct tree
   char val;
   unsigned int freq;
 };
-
-std::deque<char> bits;
 
 void readfile()
 {
@@ -60,10 +61,27 @@ int take(int n)
   return num;
 }
 
+tree* readnode()
+{
+  tree *node = new tree;
+  int type = take(1);
+  if (type == 1) {
+    node->leaf = 1;
+    node->freq = take(bitsf);
+    node->val = take(bitsv);
+  } else if (type == 0) {
+    node->leaf = 0;
+    node->left = readnode();
+    node->right = readnode();
+  }
+}
+
 int main()
 {
   readfile();
-  printf("%d %d\n", take(6), take(6));
+  bitsf = take(6);
+  bitsv = take(6);
+  tree *root = readnode();
   return 0;
 }
 
