@@ -77,6 +77,15 @@ void findtree(tree *node, char val, std::string &code, bool &success)
   }
 }
 
+void freetree(tree *node)
+{
+  if (!node->val) {
+    freetree(node->left);
+    freetree(node->right);
+  }
+  delete node;
+}
+
 int main()
 {
   const std::string message = "hello, world! this is an example asdfghjkl";
@@ -167,6 +176,8 @@ int main()
   fwrite(file.data(), sizeof(unsigned char),
       file.size()*sizeof(unsigned char), fd);
   fclose(fd);
+
+  freetree(root);
 
   return 0;
 }
