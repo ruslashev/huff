@@ -88,7 +88,7 @@ void freetree(tree *node)
 
 int main()
 {
-  const std::string message = "hello, world! this is an example asdfghjkl";
+  const std::string message = "hello world how ya doin bro hdkl";
 
   std::map<char,unsigned int> freqs;
   for (size_t i = 0; i < message.length(); i++)
@@ -107,7 +107,7 @@ int main()
     list.push_back({n.second, n.first});
 
   std::sort(list.begin(), list.end(),
-      [](auto i, auto j) { return i.freq < j.freq; });
+      [](elem i, elem j) { return i.freq < j.freq; });
 
   while (list.size() > 1) {
     tree *node = new tree;
@@ -135,7 +135,7 @@ int main()
     list.push_front({node->freq, 0, node});
 
     std::sort(list.begin(), list.end(),
-        [](auto i, auto j) { return i.freq < j.freq; });
+        [](elem i, elem j) { return i.freq < j.freq; });
   }
   tree *root = list[0].node;
 
