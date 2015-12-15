@@ -86,9 +86,22 @@ void freetree(tree *node)
   delete node;
 }
 
-int main()
+int main(int argc, char **argv)
 {
-  const std::string message = "hello world how ya doin bro hdkl";
+  std::string message = "hello world how ya doin bro hdkl";
+  if (argc == 2) {
+    FILE *f = fopen(argv[1], "rb");
+    if (!f)
+      die("failed to open file \"%s\"", argv[1]);
+    fseek(f, 0, SEEK_END);
+	size_t len = ftell(f);
+	rewind(f);
+	char *buffer = new char[len+1];
+	fread(buffer, 1, len, f);
+	fclose(f);
+	buffer[len] = 0;
+	message = buffer;
+  }
 
   std::map<char,unsigned int> freqs;
   for (size_t i = 0; i < message.length(); i++)
